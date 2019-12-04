@@ -40,7 +40,8 @@ linux: static-tests test $(BINARY)
 .PHONY: darwin
 darwin: static-tests test $(BINARY)-darwin
 
-
+.PHONY:arm64
+arm64: static-tests test $(BINARY)-arm64
 
 SOURCES = $(shell find -name vendor -prune -o -name \*.go -print)
 
