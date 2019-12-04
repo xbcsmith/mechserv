@@ -10,6 +10,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
+// MechModel gorm model for mechs
 type MechModel struct {
 	gorm.Model
 	Uniq        string
