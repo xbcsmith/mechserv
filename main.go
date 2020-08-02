@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net"
@@ -15,12 +16,248 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fatih/structs"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"github.com/oklog/ulid"
 )
+
+const indexHTML string = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Mechserver</title>
+    <style>
+    header {
+      background-color: #3d3d3d;
+      padding: 30px;
+      text-align: center;
+      font-size: 35px;
+      color: white;
+    }
+    footer {
+      background-color: #3d3d3d;
+      padding: 10px;
+      text-align: center;
+      color: white;
+      height: 50px;
+
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+    	margin: 0;
+    	font-family: sans-serif;
+    	-webkit-font-smoothing: antialiased;
+    	-moz-osx-font-smoothing: grayscale;
+    	background-color: #ACACAC;
+      display: flex;
+      flex-direction: column;
+    }
+    h2, h3, h4 {
+    	color: #fff;
+    	font-size: calc(16px + 2vmin);
+      margin-top: 12px;
+      margin-right: 12px;
+      margin-left: 12px;
+    	margin-bottom: 0px;
+    }
+    code {
+    	font-family: monospace;
+    }
+    table {
+    	margin-top: 12px;
+      margin-right: 12px;
+      margin-left: 12px;
+    	margin-bottom: 12px;
+    	width: 98%;
+    	max-width: none;
+    	border-spacing: 0;
+    	empty-cells: hide;
+    	outline: 0;
+    	background-color: #fff;
+      overflow-x:auto;
+    }
+    table th {
+    	text-align: left;
+      background-color: #7C7C7C;
+      color: #fff;
+    }
+    tr:nth-child(odd){background-color: #f2f2f2}
+    a {
+      text-decoration: none;
+    }
+    .mech_title {
+    	min-height: 100vh;
+    	font-size: calc(10px + 2vmin);
+      font-weight: bold;
+    }
+    .mech {
+    	min-height: 100vh;
+    	font-size: calc(10px + 2vmin);
+    }
+    .content {
+      flex: 1 0 auto;
+    }
+    .footer {
+      flex-shrink: 0;
+    }
+  </style>
+  </head>
+  <body>
+    <header>
+      <h2>Mechserver v1.0.0</h2>
+    </header>
+    <table>
+      <tbody>
+        <tr class="mech_title">
+          <th>ID</th>
+          <th>Name</th>
+          <th>Version</th>
+          <th>Release</th>
+          <th>Description</th>
+        </tr>
+        {{ range .Mechs }}
+        <tr class="mech">
+          <td>
+            <meta http-equiv="content-type" content="text/html; charset=utf-8">
+            <a id="href" href="./mechs/{{ .ID }}">{{ .ID }}</a> </td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Version }}</td>
+          <td>{{ .Release }}</td>
+          <td>{{ .Description }}</td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+    <p class="content"> </p>
+    <footer class="footer">Copyright © 2019 Brett Smith &lt;xbcsmith@gmail.com&gt;, . All Rights Reserved.</footer>
+  </body>
+</html>
+
+`
+
+const mechHTML string = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Mech</title>
+    <style>
+    header {
+      background-color: #3d3d3d;
+      padding: 30px;
+      text-align: center;
+      font-size: 35px;
+      color: white;
+    }
+    footer {
+      background-color: #3d3d3d;
+      padding: 10px;
+      text-align: center;
+      color: white;
+      height: 50px;
+
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+    	margin: 0;
+    	font-family: sans-serif;
+    	-webkit-font-smoothing: antialiased;
+    	-moz-osx-font-smoothing: grayscale;
+    	background-color: #ACACAC;
+      display: flex;
+      flex-direction: column;
+    }
+    h2, h3, h4 {
+    	color: #fff;
+    	font-size: calc(16px + 2vmin);
+      margin-top: 12px;
+      margin-right: 12px;
+      margin-left: 12px;
+    	margin-bottom: 0px;
+    }
+    code {
+    	font-family: monospace;
+    }
+    table {
+    	margin-top: 12px;
+      margin-right: 12px;
+      margin-left: 12px;
+    	margin-bottom: 12px;
+    	width: 98%;
+    	max-width: none;
+    	border-spacing: 0;
+    	empty-cells: hide;
+    	outline: 0;
+    	background-color: #fff;
+      overflow-x:auto;
+    }
+    table th {
+    	text-align: left;
+      background-color: #7C7C7C;
+      color: #fff;
+    }
+    tr:nth-child(odd){background-color: #f2f2f2}
+    a {
+      text-decoration: none;
+    }
+    .mech_title {
+    	min-height: 100vh;
+    	font-size: calc(10px + 2vmin);
+      font-weight: bold;
+    }
+    .mech {
+    	min-height: 100vh;
+    	font-size: calc(10px + 2vmin);
+    }
+    .content {
+      flex: 1 0 auto;
+    }
+    .footer {
+      flex-shrink: 0;
+    }
+  </style>
+  </head>
+  <body>
+    <header>
+      <h2>Mechserver v1.0.0</h2>
+    </header>
+    <table>
+      <tbody>
+        <tr>
+          <th class="mech_title">ID</th>
+          <td class="mech">{{ .ID }}</td>
+        </tr>
+        <tr>
+          <th class="mech_title">Name</th>
+          <td class="mech">{{ .Name }}</td>
+        </tr>
+        <tr>
+          <th class="mech_title">Version </th>
+          <td class="mech">{{ .Version }}</td>
+        </tr>
+        <tr>
+          <th class="mech_title">Release </th>
+          <td class="mech">{{ .Release }}</td>
+        </tr>
+        <tr>
+          <th class="mech_title">Description</th>
+          <td class="mech">{{ .Description }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="content"> </p>
+    <footer class="footer">Copyright © 2019 Brett Smith &lt;xbcsmith@gmail.com&gt;, . All Rights Reserved.</footer>
+  </body>
+</html>
+
+`
 
 // GetEnv returns an env variable value or a default
 // GetEnv func takes no as input and returns key, fallback string string
@@ -36,6 +273,22 @@ func GetEnv(key, fallback string) string {
 func NewULID() string {
 	newid, _ := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
 	return newid.String()
+}
+
+// maketmpl helper function
+func maketmpl(data map[string]interface{}, tmpl string) (string, error) {
+	builder := &strings.Builder{}
+	t := template.Must(template.New("new").Parse(tmpl))
+	if err := t.Execute(builder, data); err != nil {
+		return ``, err
+	}
+	s := builder.String()
+	return s, nil
+}
+
+// Mech struct for mech
+type Mechs struct {
+	Mechs []Mech `json:"mechs"`
 }
 
 // Mech struct for mech
@@ -122,6 +375,13 @@ func NewAPI(cfg *Config) *chi.Mux {
 				r.Delete("/mechs/{id}", s.DeleteMech())
 			}
 		})
+		r.Route("/", func(r chi.Router) {
+			{
+				r.Get("/", s.GetHomeHTML())
+				r.Get("/mechs", s.GetMechsHTML())
+				r.Get("/mechs/{id}", s.GetMechHTML())
+			}
+		})
 	})
 
 	return router
@@ -132,10 +392,34 @@ type Server struct {
 	cfg *Config
 }
 
+// GetHomeHTML func takes no as input and returns http.HandlerFunc
+func (s *Server) GetHomeHTML() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		content := "<html><body><h1>Mechserv v1.0.0</h2><p>try http://localhost:999/mechs</p></body></html>"
+		render.HTML(w, r, content)
+	}
+}
+
 // GetMechs func takes no as input and returns http.HandlerFunc
 func (s *Server) GetMechs() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, mechs)
+	}
+}
+
+// GetMechsHTML func takes no as input and returns http.HandlerFunc
+func (s *Server) GetMechsHTML() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		index := &Mechs{
+			Mechs: mechs,
+		}
+		content, err := maketmpl(structs.Map(index), indexHTML)
+		if err != nil {
+			render.Status(r, http.StatusExpectationFailed)
+			render.JSON(w, r, &Resp{Error: "Template failed to render"})
+			return
+		}
+		render.HTML(w, r, content)
 	}
 }
 
@@ -151,7 +435,6 @@ func (s *Server) CreateMech() http.HandlerFunc {
 		fmt.Printf("Creating new mech : %s\n", mech.ID)
 		mechs = append(mechs, *mech)
 		render.JSON(w, r, &Resp{ID: mech.ID})
-
 	}
 }
 
@@ -170,7 +453,30 @@ func (s *Server) GetMech() http.HandlerFunc {
 		fmt.Printf("Did not find Mech : %s\n", id)
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &Resp{Error: "missing id"})
+	}
+}
 
+// GetMechHTML func takes no as input and returns http.HandlerFunc
+func (s *Server) GetMechHTML() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := strings.TrimSpace(chi.URLParam(r, "id"))
+		fmt.Printf("GET mech : %s\n", id)
+		for _, item := range mechs {
+			if item.ID == id {
+				content, err := maketmpl(structs.Map(item), mechHTML)
+				if err != nil {
+					render.Status(r, http.StatusExpectationFailed)
+					render.JSON(w, r, &Resp{Error: "Template failed to render"})
+					return
+				}
+				render.HTML(w, r, content)
+				return
+			}
+		}
+
+		fmt.Printf("Did not find Mech : %s\n", id)
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &Resp{Error: "missing id"})
 	}
 }
 
@@ -190,7 +496,6 @@ func (s *Server) DeleteMech() http.HandlerFunc {
 
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &Resp{Error: "Invalid ID"})
-
 	}
 }
 
@@ -253,16 +558,28 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		server.Serve(listener)
+		err := server.Serve(listener)
+		if err != nil {
+			if err != http.ErrServerClosed {
+				panic(err)
+			}
+			fmt.Printf("listener closed")
+		}
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		<-ctx.Done()
-		server.Shutdown(context.Background())
+		fmt.Printf("shutting down server")
+		err := server.Shutdown(context.Background())
+		if err != nil {
+			if err != http.ErrServerClosed {
+				panic(err)
+			}
+		}
+		fmt.Printf("server shut down")
 	}()
 
 	wg.Wait()
-
 }

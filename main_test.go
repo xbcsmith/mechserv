@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"gotest.tools/assert"
-	is "gotest.tools/assert/cmp"
 	"os"
 	"strings"
 	"testing"
+
+	"gotest.tools/assert"
+	is "gotest.tools/assert/cmp"
 )
 
 func TestGetEnv(t *testing.T) {
@@ -34,7 +35,6 @@ func TestDecodeMechFromJson(t *testing.T) {
 	mech, err := DecodeMechFromJSON(strings.NewReader(content))
 	assert.Assert(t, is.Nil(err))
 	assert.Equal(t, mech.Name, "foo")
-
 }
 
 func TestNewMech(t *testing.T) {
