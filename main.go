@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: © 2020 Brett Smith <xbcsmith@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
+
 package main
 
 import (
@@ -8,7 +11,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -31,81 +33,87 @@ const indexHTML string = `
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Mechserver</title>
     <style>
-    header {
-      background-color: #3d3d3d;
-      padding: 30px;
-      text-align: center;
-      font-size: 35px;
-      color: white;
-    }
-    footer {
-      background-color: #3d3d3d;
-      padding: 10px;
-      text-align: center;
-      color: white;
-      height: 50px;
+		header {
+		  background-color: #21252B;
+		  padding: 30px;
+		  text-align: center;
+		  font-size: 35px;
+		  color: #6A9FB5;
+		}
+		footer {
+		  background-color: #21252B;
+		  padding: 10px;
+		  text-align: center;
+		  color: #A65837;
+		  height: 50px;
 
-    }
-    html, body {
-      height: 100%;
-    }
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      background-color: #ACACAC;
-      display: flex;
-      flex-direction: column;
-    }
-    h2, h3, h4 {
-      color: #fff;
-      font-size: calc(16px + 2vmin);
-      margin-top: 12px;
-      margin-right: 12px;
-      margin-left: 12px;
-      margin-bottom: 0px;
-    }
-    code {
-      font-family: monospace;
-    }
-    table {
-      margin-top: 12px;
-      margin-right: 12px;
-      margin-left: 12px;
-      margin-bottom: 12px;
-      width: 98%;
-      max-width: none;
-      border-spacing: 0;
-      empty-cells: hide;
-      outline: 0;
-      background-color: #fff;
-      overflow-x:auto;
-    }
-    table th {
-      text-align: left;
-      background-color: #7C7C7C;
-      color: #fff;
-    }
-    tr:nth-child(odd){background-color: #f2f2f2}
-    a {
-      text-decoration: none;
-    }
-    .mech_title {
-      min-height: 100vh;
-      font-size: calc(10px + 2vmin);
-      font-weight: bold;
-    }
-    .mech {
-      min-height: 100vh;
-      font-size: calc(10px + 2vmin);
-    }
-    .content {
-      flex: 1 0 auto;
-    }
-    .footer {
-      flex-shrink: 0;
-    }
+		}
+		html, body {
+		  height: 100%;
+		}
+		body {
+			margin: 0;
+			font-family: sans-serif;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			background-color: #282C34;
+		  display: flex;
+		  flex-direction: column;
+		}
+		h1 {
+		  color: #9B3C34;
+		}
+		h2, h3, h4 {
+			color: #fff;
+			font-size: calc(16px + 2vmin);
+		  margin-top: 12px;
+		  margin-right: 12px;
+		  margin-left: 12px;
+			margin-bottom: 0px;
+		  color: #6A9FB5;
+		}
+		code {
+			font-family: monospace;
+		}
+		table {
+			margin-top: 12px;
+		  margin-right: 12px;
+		  margin-left: 12px;
+			margin-bottom: 12px;
+			width: 98%;
+			max-width: none;
+			border-spacing: 0;
+			empty-cells: hide;
+			outline: 0;
+		  overflow-x:auto;
+		  color: #fff;
+		}
+		table th {
+			text-align: left;
+		  background-color: #2C323C;
+		  color: #3D7DE7;
+		}
+		tr:nth-child(odd){background-color: #2C323C}
+		tr:nth-child(even){background-color: #3A3F4B}
+		a {
+		  text-decoration: none;
+		  color: #76CC64;
+		}
+		.mech_title {
+			min-height: 100vh;
+			font-size: calc(10px + 2vmin);
+		  font-weight: bold;
+		}
+		.mech {
+			min-height: 100vh;
+			font-size: calc(10px + 2vmin);
+		}
+		.content {
+		  flex: 1 0 auto;
+		}
+		.footer {
+		  flex-shrink: 0;
+		}
   </style>
   </head>
   <body>
@@ -147,81 +155,87 @@ const mechHTML string = `<!DOCTYPE html>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Mech</title>
     <style>
-    header {
-      background-color: #3d3d3d;
-      padding: 30px;
-      text-align: center;
-      font-size: 35px;
-      color: white;
-    }
-    footer {
-      background-color: #3d3d3d;
-      padding: 10px;
-      text-align: center;
-      color: white;
-      height: 50px;
+		header {
+		  background-color: #21252B;
+		  padding: 30px;
+		  text-align: center;
+		  font-size: 35px;
+		  color: #6A9FB5;
+		}
+		footer {
+		  background-color: #21252B;
+		  padding: 10px;
+		  text-align: center;
+		  color: #A65837;
+		  height: 50px;
 
-    }
-    html, body {
-      height: 100%;
-    }
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      background-color: #ACACAC;
-      display: flex;
-      flex-direction: column;
-    }
-    h2, h3, h4 {
-      color: #fff;
-      font-size: calc(16px + 2vmin);
-      margin-top: 12px;
-      margin-right: 12px;
-      margin-left: 12px;
-      margin-bottom: 0px;
-    }
-    code {
-      font-family: monospace;
-    }
-    table {
-      margin-top: 12px;
-      margin-right: 12px;
-      margin-left: 12px;
-      margin-bottom: 12px;
-      width: 98%;
-      max-width: none;
-      border-spacing: 0;
-      empty-cells: hide;
-      outline: 0;
-      background-color: #fff;
-      overflow-x:auto;
-    }
-    table th {
-      text-align: left;
-      background-color: #7C7C7C;
-      color: #fff;
-    }
-    tr:nth-child(odd){background-color: #f2f2f2}
-    a {
-      text-decoration: none;
-    }
-    .mech_title {
-      min-height: 100vh;
-      font-size: calc(10px + 2vmin);
-      font-weight: bold;
-    }
-    .mech {
-      min-height: 100vh;
-      font-size: calc(10px + 2vmin);
-    }
-    .content {
-      flex: 1 0 auto;
-    }
-    .footer {
-      flex-shrink: 0;
-    }
+		}
+		html, body {
+		  height: 100%;
+		}
+		body {
+			margin: 0;
+			font-family: sans-serif;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			background-color: #282C34;
+		  display: flex;
+		  flex-direction: column;
+		}
+		h1 {
+		  color: #9B3C34;
+		}
+		h2, h3, h4 {
+			color: #fff;
+			font-size: calc(16px + 2vmin);
+		  margin-top: 12px;
+		  margin-right: 12px;
+		  margin-left: 12px;
+			margin-bottom: 0px;
+		  color: #6A9FB5;
+		}
+		code {
+			font-family: monospace;
+		}
+		table {
+			margin-top: 12px;
+		  margin-right: 12px;
+		  margin-left: 12px;
+			margin-bottom: 12px;
+			width: 98%;
+			max-width: none;
+			border-spacing: 0;
+			empty-cells: hide;
+			outline: 0;
+		  overflow-x:auto;
+		  color: #fff;
+		}
+		table th {
+			text-align: left;
+		  background-color: #2C323C;
+		  color: #3D7DE7;
+		}
+		tr:nth-child(odd){background-color: #2C323C}
+		tr:nth-child(even){background-color: #3A3F4B}
+		a {
+		  text-decoration: none;
+		  color: #76CC64;
+		}
+		.mech_title {
+			min-height: 100vh;
+			font-size: calc(10px + 2vmin);
+		  font-weight: bold;
+		}
+		.mech {
+			min-height: 100vh;
+			font-size: calc(10px + 2vmin);
+		}
+		.content {
+		  flex: 1 0 auto;
+		}
+		.footer {
+		  flex-shrink: 0;
+		}
   </style>
   </head>
   <body>
@@ -416,7 +430,7 @@ func (s *Server) GetMechsHTML() http.HandlerFunc {
 		content, err := maketmpl(structs.Map(index), indexHTML)
 		if err != nil {
 			render.Status(r, http.StatusExpectationFailed)
-			render.JSON(w, r, &Resp{Error: "Template failed to render"})
+			render.JSON(w, r, &Resp{ID: "", Mech: nil, Error: "Template failed to render"})
 			return
 		}
 		render.HTML(w, r, content)
@@ -429,12 +443,12 @@ func (s *Server) CreateMech() http.HandlerFunc {
 		mech, err := DecodeMechFromJSON(r.Body)
 		if err != nil {
 			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, &Resp{Error: "Invalid mech JSON"})
+			render.JSON(w, r, &Resp{ID: "", Mech: nil, Error: "Invalid mech JSON"})
 			return
 		}
 		fmt.Printf("Creating new mech : %s\n", mech.ID)
 		mechs = append(mechs, *mech)
-		render.JSON(w, r, &Resp{ID: mech.ID})
+		render.JSON(w, r, &Resp{ID: mech.ID, Mech: nil, Error: "null"})
 	}
 }
 
@@ -443,16 +457,16 @@ func (s *Server) GetMech() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := strings.TrimSpace(chi.URLParam(r, "id"))
 		fmt.Printf("GET mech : %s\n", id)
-		for _, item := range mechs {
+		for i, item := range mechs {
 			if item.ID == id {
-				render.JSON(w, r, &Resp{Mech: &item})
+				render.JSON(w, r, &Resp{ID: item.ID, Mech: &mechs[i], Error: "null"})
 				return
 			}
 		}
 
 		fmt.Printf("Did not find Mech : %s\n", id)
 		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, &Resp{Error: "missing id"})
+		render.JSON(w, r, &Resp{ID: "", Mech: nil, Error: "missing id"})
 	}
 }
 
@@ -466,7 +480,7 @@ func (s *Server) GetMechHTML() http.HandlerFunc {
 				content, err := maketmpl(structs.Map(item), mechHTML)
 				if err != nil {
 					render.Status(r, http.StatusExpectationFailed)
-					render.JSON(w, r, &Resp{Error: "Template failed to render"})
+					render.JSON(w, r, &Resp{ID: "", Mech: nil, Error: "Template failed to render"})
 					return
 				}
 				render.HTML(w, r, content)
@@ -476,7 +490,7 @@ func (s *Server) GetMechHTML() http.HandlerFunc {
 
 		fmt.Printf("Did not find Mech : %s\n", id)
 		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, &Resp{Error: "missing id"})
+		render.JSON(w, r, &Resp{ID: "", Mech: nil, Error: "missing id"})
 	}
 }
 
@@ -495,7 +509,7 @@ func (s *Server) DeleteMech() http.HandlerFunc {
 		}
 
 		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, &Resp{Error: "Invalid ID"})
+		render.JSON(w, r, &Resp{ID: "", Mech: nil, Error: "Invalid ID"})
 	}
 }
 
@@ -534,12 +548,14 @@ func main() {
 	if cert != "" && key != "" {
 		servTLSCert, err := tls.LoadX509KeyPair(cert, key)
 		if err != nil {
-			log.Fatalf("invalid key pair: %v", err)
+			fmt.Printf("invalid key pair: %v", err)
+			panic(err)
 		}
 
 		// Create the TLS Config with the CA pool and enable Client certificate validation
 		tlsConfig := &tls.Config{
 			Certificates: []tls.Certificate{servTLSCert},
+			MinVersion:   tls.VersionTLS13,
 		}
 
 		// Create a Server instance to listen on port 8443 with the TLS config
@@ -548,7 +564,7 @@ func main() {
 		listener = tls.NewListener(listener, tlsConfig)
 		fmt.Printf("Serving https://%s:%s/api/v1/mechs\n", host, port)
 	} else {
-		//Run insecure if certs are not provided.
+		// Run insecure if certs are not provided.
 		fmt.Printf("Serving http://%s:%s/api/v1/mechs\n", host, port)
 		fmt.Printf("WARING: TLS not enabled\n")
 	}

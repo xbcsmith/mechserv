@@ -1,7 +1,9 @@
+// SPDX-FileCopyrightText: © 2020 Brett Smith <xbcsmith@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
+
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -45,10 +47,4 @@ func TestNewMech(t *testing.T) {
 func TestNewConfig(t *testing.T) {
 	cfg := NewConfig("localhost", "9999")
 	assert.Assert(t, cfg.Host == "localhost")
-}
-
-func TestApi(t *testing.T) {
-	cfg := NewConfig("localhost", "9999")
-	router := NewAPI(cfg)
-	fmt.Printf("%v\n", router)
 }
