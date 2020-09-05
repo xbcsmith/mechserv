@@ -50,40 +50,40 @@ const indexHTML string = `
       height: 100%;
     }
     body {
-    	margin: 0;
-    	font-family: sans-serif;
-    	-webkit-font-smoothing: antialiased;
-    	-moz-osx-font-smoothing: grayscale;
-    	background-color: #ACACAC;
+      margin: 0;
+      font-family: sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #ACACAC;
       display: flex;
       flex-direction: column;
     }
     h2, h3, h4 {
-    	color: #fff;
-    	font-size: calc(16px + 2vmin);
+      color: #fff;
+      font-size: calc(16px + 2vmin);
       margin-top: 12px;
       margin-right: 12px;
       margin-left: 12px;
-    	margin-bottom: 0px;
+      margin-bottom: 0px;
     }
     code {
-    	font-family: monospace;
+      font-family: monospace;
     }
     table {
-    	margin-top: 12px;
+      margin-top: 12px;
       margin-right: 12px;
       margin-left: 12px;
-    	margin-bottom: 12px;
-    	width: 98%;
-    	max-width: none;
-    	border-spacing: 0;
-    	empty-cells: hide;
-    	outline: 0;
-    	background-color: #fff;
+      margin-bottom: 12px;
+      width: 98%;
+      max-width: none;
+      border-spacing: 0;
+      empty-cells: hide;
+      outline: 0;
+      background-color: #fff;
       overflow-x:auto;
     }
     table th {
-    	text-align: left;
+      text-align: left;
       background-color: #7C7C7C;
       color: #fff;
     }
@@ -92,13 +92,13 @@ const indexHTML string = `
       text-decoration: none;
     }
     .mech_title {
-    	min-height: 100vh;
-    	font-size: calc(10px + 2vmin);
+      min-height: 100vh;
+      font-size: calc(10px + 2vmin);
       font-weight: bold;
     }
     .mech {
-    	min-height: 100vh;
-    	font-size: calc(10px + 2vmin);
+      min-height: 100vh;
+      font-size: calc(10px + 2vmin);
     }
     .content {
       flex: 1 0 auto;
@@ -166,40 +166,40 @@ const mechHTML string = `<!DOCTYPE html>
       height: 100%;
     }
     body {
-    	margin: 0;
-    	font-family: sans-serif;
-    	-webkit-font-smoothing: antialiased;
-    	-moz-osx-font-smoothing: grayscale;
-    	background-color: #ACACAC;
+      margin: 0;
+      font-family: sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #ACACAC;
       display: flex;
       flex-direction: column;
     }
     h2, h3, h4 {
-    	color: #fff;
-    	font-size: calc(16px + 2vmin);
+      color: #fff;
+      font-size: calc(16px + 2vmin);
       margin-top: 12px;
       margin-right: 12px;
       margin-left: 12px;
-    	margin-bottom: 0px;
+      margin-bottom: 0px;
     }
     code {
-    	font-family: monospace;
+      font-family: monospace;
     }
     table {
-    	margin-top: 12px;
+      margin-top: 12px;
       margin-right: 12px;
       margin-left: 12px;
-    	margin-bottom: 12px;
-    	width: 98%;
-    	max-width: none;
-    	border-spacing: 0;
-    	empty-cells: hide;
-    	outline: 0;
-    	background-color: #fff;
+      margin-bottom: 12px;
+      width: 98%;
+      max-width: none;
+      border-spacing: 0;
+      empty-cells: hide;
+      outline: 0;
+      background-color: #fff;
       overflow-x:auto;
     }
     table th {
-    	text-align: left;
+      text-align: left;
       background-color: #7C7C7C;
       color: #fff;
     }
@@ -208,13 +208,13 @@ const mechHTML string = `<!DOCTYPE html>
       text-decoration: none;
     }
     .mech_title {
-    	min-height: 100vh;
-    	font-size: calc(10px + 2vmin);
+      min-height: 100vh;
+      font-size: calc(10px + 2vmin);
       font-weight: bold;
     }
     .mech {
-    	min-height: 100vh;
-    	font-size: calc(10px + 2vmin);
+      min-height: 100vh;
+      font-size: calc(10px + 2vmin);
     }
     .content {
       flex: 1 0 auto;
@@ -286,7 +286,7 @@ func maketmpl(data map[string]interface{}, tmpl string) (string, error) {
 	return s, nil
 }
 
-// Mech struct for mech
+// Mechs struct for mechs
 type Mechs struct {
 	Mechs []Mech `json:"mechs"`
 }

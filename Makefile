@@ -170,6 +170,3 @@ help:
 .PHONY: version
 version:
 	@echo $(VERSION)
-
-
-
