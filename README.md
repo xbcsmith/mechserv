@@ -24,3 +24,13 @@ export MECHSERV_PORT="9999"
 # Create more mechs
 ./mechit.py create --name "brak" --version "11.1.2" --description "Mech of the Barbarian" --debug
 ```
+
+## k8s
+
+```bash
+kubectl create namespace mechserver
+```
+
+```bash
+kubectl apply -f ci/deployment.yaml
+```

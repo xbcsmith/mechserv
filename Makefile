@@ -87,7 +87,7 @@ $(GO2XUNIT): ; $(info $(M) building go2xunit…)
 GOBINDATA = $(TOOLS)/go-bindata
 $(GOBINDATA): ; $(info $(M) building go-bindata…)
 	@mkdir -p $(TOOLS)
-	$Q go build -o $@ github.com/shuLhan/go-bindata/cmd/go-bindata
+	$Q go build -o $@ github.com/go-bindata/go-bindata/cmd/go-bindata
 
 GOVERSIONINFO = $(TOOLS)/goversioninfo
 $(GOVERSIONINFO): ; $(info $(M) building goversioninfo…)
@@ -136,6 +136,10 @@ test-coverage: fmt lint test-coverage-tools ; $(info $(M) running coverage tests
 	$Q $(GOCOVMERGE) $(COVERAGE_DIR)/coverage/*.cover > $(COVERAGE_PROFILE)
 	$Q $(GO) tool cover -html=$(COVERAGE_PROFILE) -o $(COVERAGE_HTML)
 	$Q $(GOCOV) convert $(COVERAGE_PROFILE) | $(GOCOVXML) > $(COVERAGE_XML)
+
+.PHONY: container
+container: ; $(info $(M) running docker build…) @ ## Run docker build to build a container
+	$Q docker build -t mechserv:local -f Dockerfile .
 
 .PHONY: lint
 lint: $(GOLINT) ; $(info $(M) running golint…) @ ## Run golint change ret=1 to make lint required
