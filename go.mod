@@ -1,4 +1,4 @@
-module mechserv
+module github.com/xbcsmith/mechserv
 
 go 1.14
 

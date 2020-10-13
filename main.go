@@ -28,253 +28,6 @@ import (
 	"github.com/xbcsmith/mechserv/templates"
 )
 
-const indexHTML string = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Mechserver</title>
-    <style>
-		header {
-		  background-color: #21252B;
-		  padding: 30px;
-		  text-align: center;
-		  font-size: 35px;
-		  color: #6A9FB5;
-		}
-		footer {
-		  background-color: #21252B;
-		  padding: 10px;
-		  text-align: center;
-		  color: #A65837;
-		  height: 50px;
-
-		}
-		html, body {
-		  height: 100%;
-		}
-		body {
-			margin: 0;
-			font-family: sans-serif;
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
-			background-color: #282C34;
-		  display: flex;
-		  flex-direction: column;
-		}
-		h1 {
-		  color: #9B3C34;
-		}
-		h2, h3, h4 {
-			color: #fff;
-			font-size: calc(16px + 2vmin);
-		  margin-top: 12px;
-		  margin-right: 12px;
-		  margin-left: 12px;
-			margin-bottom: 0px;
-		  color: #6A9FB5;
-		}
-		code {
-			font-family: monospace;
-		}
-		table {
-			margin-top: 12px;
-		  margin-right: 12px;
-		  margin-left: 12px;
-			margin-bottom: 12px;
-			width: 98%;
-			max-width: none;
-			border-spacing: 0;
-			empty-cells: hide;
-			outline: 0;
-		  overflow-x:auto;
-		  color: #fff;
-		}
-		table th {
-			text-align: left;
-		  background-color: #2C323C;
-		  color: #3D7DE7;
-		}
-		tr:nth-child(odd){background-color: #2C323C}
-		tr:nth-child(even){background-color: #3A3F4B}
-		a {
-		  text-decoration: none;
-		  color: #76CC64;
-		}
-		.mech_title {
-			min-height: 100vh;
-			font-size: calc(10px + 2vmin);
-		  font-weight: bold;
-		}
-		.mech {
-			min-height: 100vh;
-			font-size: calc(10px + 2vmin);
-		}
-		.content {
-		  flex: 1 0 auto;
-		}
-		.footer {
-		  flex-shrink: 0;
-		}
-  </style>
-  </head>
-  <body>
-    <header>
-      <h2>Mechserver v1.0.0</h2>
-    </header>
-    <table>
-      <tbody>
-        <tr class="mech_title">
-          <th>ID</th>
-          <th>Name</th>
-          <th>Version</th>
-          <th>Release</th>
-          <th>Description</th>
-        </tr>
-        {{ range .Mechs }}
-        <tr class="mech">
-          <td>
-            <meta http-equiv="content-type" content="text/html; charset=utf-8">
-            <a id="href" href="./mechs/{{ .ID }}">{{ .ID }}</a> </td>
-          <td>{{ .Name }}</td>
-          <td>{{ .Version }}</td>
-          <td>{{ .Release }}</td>
-          <td>{{ .Description }}</td>
-        </tr>
-        {{ end }}
-      </tbody>
-    </table>
-    <p class="content"> </p>
-    <footer class="footer">Copyright © 2019 Brett Smith &lt;xbcsmith@gmail.com&gt;, . All Rights Reserved.</footer>
-  </body>
-</html>
-
-`
-
-const mechHTML string = `<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Mech</title>
-    <style>
-		header {
-		  background-color: #21252B;
-		  padding: 30px;
-		  text-align: center;
-		  font-size: 35px;
-		  color: #6A9FB5;
-		}
-		footer {
-		  background-color: #21252B;
-		  padding: 10px;
-		  text-align: center;
-		  color: #A65837;
-		  height: 50px;
-
-		}
-		html, body {
-		  height: 100%;
-		}
-		body {
-			margin: 0;
-			font-family: sans-serif;
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
-			background-color: #282C34;
-		  display: flex;
-		  flex-direction: column;
-		}
-		h1 {
-		  color: #9B3C34;
-		}
-		h2, h3, h4 {
-			color: #fff;
-			font-size: calc(16px + 2vmin);
-		  margin-top: 12px;
-		  margin-right: 12px;
-		  margin-left: 12px;
-			margin-bottom: 0px;
-		  color: #6A9FB5;
-		}
-		code {
-			font-family: monospace;
-		}
-		table {
-			margin-top: 12px;
-		  margin-right: 12px;
-		  margin-left: 12px;
-			margin-bottom: 12px;
-			width: 98%;
-			max-width: none;
-			border-spacing: 0;
-			empty-cells: hide;
-			outline: 0;
-		  overflow-x:auto;
-		  color: #fff;
-		}
-		table th {
-			text-align: left;
-		  background-color: #2C323C;
-		  color: #3D7DE7;
-		}
-		tr:nth-child(odd){background-color: #2C323C}
-		tr:nth-child(even){background-color: #3A3F4B}
-		a {
-		  text-decoration: none;
-		  color: #76CC64;
-		}
-		.mech_title {
-			min-height: 100vh;
-			font-size: calc(10px + 2vmin);
-		  font-weight: bold;
-		}
-		.mech {
-			min-height: 100vh;
-			font-size: calc(10px + 2vmin);
-		}
-		.content {
-		  flex: 1 0 auto;
-		}
-		.footer {
-		  flex-shrink: 0;
-		}
-  </style>
-  </head>
-  <body>
-    <header>
-      <h2>Mechserver v1.0.0</h2>
-    </header>
-    <table>
-      <tbody>
-        <tr>
-          <th class="mech_title">ID</th>
-          <td class="mech">{{ .ID }}</td>
-        </tr>
-        <tr>
-          <th class="mech_title">Name</th>
-          <td class="mech">{{ .Name }}</td>
-        </tr>
-        <tr>
-          <th class="mech_title">Version </th>
-          <td class="mech">{{ .Version }}</td>
-        </tr>
-        <tr>
-          <th class="mech_title">Release </th>
-          <td class="mech">{{ .Release }}</td>
-        </tr>
-        <tr>
-          <th class="mech_title">Description</th>
-          <td class="mech">{{ .Description }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <p class="content"> </p>
-    <footer class="footer">Copyright © 2019 Brett Smith &lt;xbcsmith@gmail.com&gt;, . All Rights Reserved.</footer>
-  </body>
-</html>
-
-`
-
 // GetEnv returns an env variable value or a default
 // GetEnv func takes no as input and returns key, fallback string string
 func GetEnv(key, fallback string) string {
@@ -377,10 +130,10 @@ func NewAPI(cfg *Config) *chi.Mux {
 		// Add some middleware to our router
 		r.Use(cors.Handler,
 			render.SetContentType(render.ContentTypeJSON), // set content-type headers as application/json
-			middleware.Logger,          // log api request calls
-			middleware.DefaultCompress, // compress results, mostly gzipping assets and json
-			middleware.StripSlashes,    // match paths with a trailing slash, strip it, and continue routing through the mux
-			middleware.Recoverer,       // recover from panics without crashing server
+			middleware.Logger,       // log api request calls
+			middleware.Compress(5),  // compress results, mostly gzipping assets and json
+			middleware.StripSlashes, // match paths with a trailing slash, strip it, and continue routing through the mux
+			middleware.Recoverer,    // recover from panics without crashing server
 		)
 
 		r.Route("/api/v1", func(r chi.Router) {
@@ -389,6 +142,7 @@ func NewAPI(cfg *Config) *chi.Mux {
 				r.Post("/mechs", s.CreateMech())
 				r.Get("/mechs/{id}", s.GetMech())
 				r.Delete("/mechs/{id}", s.DeleteMech())
+				r.Get("/style.css", s.GetCSS())
 			}
 		})
 		r.Route("/", func(r chi.Router) {
@@ -412,7 +166,15 @@ type Server struct {
 func (s *Server) GetHomeHTML() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		content := templates.MustAsset("index.html")
-		render.HTML(w, r, content)
+		render.HTML(w, r, string(content))
+	}
+}
+
+// GetCSS returns the CSS for HTML interfaces
+func (s *Server) GetCSS() http.HandlerFunc {
+	content := templates.MustAsset("mech.css")
+	return func(w http.ResponseWriter, r *http.Request) {
+		render.PlainText(w, r, string(content))
 	}
 }
 
@@ -426,10 +188,11 @@ func (s *Server) GetMechs() http.HandlerFunc {
 // GetMechsHTML func takes no as input and returns http.HandlerFunc
 func (s *Server) GetMechsHTML() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		mechsHTML := string(templates.MustAsset("mechs.html"))
 		index := &Mechs{
 			Mechs: mechs,
 		}
-		content, err := maketmpl(structs.Map(index), indexHTML)
+		content, err := maketmpl(structs.Map(index), mechsHTML)
 		if err != nil {
 			render.Status(r, http.StatusExpectationFailed)
 			render.JSON(w, r, &Resp{ID: "", Mech: nil, Error: "Template failed to render"})
@@ -475,6 +238,7 @@ func (s *Server) GetMech() http.HandlerFunc {
 // GetMechHTML func takes no as input and returns http.HandlerFunc
 func (s *Server) GetMechHTML() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		mechHTML := string(templates.MustAsset("mech.html"))
 		id := strings.TrimSpace(chi.URLParam(r, "id"))
 		fmt.Printf("GET mech : %s\n", id)
 		for _, item := range mechs {
