@@ -16,16 +16,16 @@ spec:
     spec:
       containers:
         - name: mechserver
-          image: xbcsmith/mechserver:1.0.0
+          image: "xbcsmith/mechserver:1.0.0"
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "100m"
+              memory: 64Mi
+              cpu: 100m
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              memory: 128Mi
+              cpu: 500m
           ports:
-          - containerPort: 9999
+            - containerPort: 9999
           imagePullPolicy: Always
 ---
 apiVersion: v1
@@ -35,9 +35,9 @@ metadata:
   namespace: mechserver
 spec:
   ports:
-  - port: 80
-    targetPort: 9999
-    name: tcp
+    - port: 80
+      targetPort: 9999
+      name: tcp
   selector:
     app: mechserver
 ---
@@ -47,13 +47,13 @@ metadata:
   name: mechserver-ingress
   namespace: mechserver
   annotations:
-    kubernetes.io/ingress.class: "traefik"
+    kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  -  host: mechserv.uniblick.io
-     http:
-      paths:
-      - path: /mechserver
-        backend:
-          serviceName: mechserver-service
-          servicePort: 80
+    - host: mechserv.uniblick.io
+      http:
+        paths:
+          - path: /mechserver
+            backend:
+              serviceName: mechserver-service
+              servicePort: 80

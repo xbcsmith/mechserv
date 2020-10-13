@@ -24,8 +24,6 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"github.com/oklog/ulid"
-
-	"github.com/xbcsmith/mechserv/templates"
 )
 
 const indexHTML string = `
@@ -411,7 +409,7 @@ type Server struct {
 // GetHomeHTML func takes no as input and returns http.HandlerFunc
 func (s *Server) GetHomeHTML() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		content := templates.MustAsset("index.html")
+		content := "<html><body><h1>Mechserv v1.0.0</h2><p>try http://localhost:999/mechs</p></body></html>"
 		render.HTML(w, r, content)
 	}
 }

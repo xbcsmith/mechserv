@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Mechserver</title>
+    <link href="api/v1/style.css" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <h2>Mechserver v1.0.0</h2>
+    </header>
+    <table>
+      <tbody>
+        <tr class="mech_title">
+          <th>ID</th>
+          <th>Name</th>
+          <th>Version</th>
+          <th>Release</th>
+          <th>Description</th>
+        </tr>
+        {{ range .Mechs }}
+        <tr class="mech">
+          <td>
+            <meta http-equiv="content-type" content="text/html; charset=utf-8">
+            <a id="href" href="./mechs/{{ .ID }}">{{ .ID }}</a> </td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Version }}</td>
+          <td>{{ .Release }}</td>
+          <td>{{ .Description }}</td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+    <p class="content"> </p>
+    <footer class="footer">Copyright © 2019 Brett Smith &lt;xbcsmith@gmail.com&gt;, . All Rights Reserved.</footer>
+  </body>
+</html>
