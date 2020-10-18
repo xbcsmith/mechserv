@@ -1,5 +1,5 @@
 PACKAGE  = github.com/xbcsmith/mechserv
-BINARY    = bin/mechserv
+BINARY   = bin/mechserv
 COMMIT  ?= $(shell git rev-parse --short=16 HEAD)
 gitversion := $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || \
 			cat $(CURDIR)/.version 2> /dev/null || echo 0.1.0-0)
@@ -26,22 +26,22 @@ TIMEOUT = 15
 
 V = 0
 Q = $(if $(filter 1,$V),,@)
-M = $(shell printf "\033[34;1m▶\033[0m")
+M = $(shell printf "\033[34;1mmechserv ▶\033[0m")
 
 .PHONY: all
-all: static-tests test $(BINARY) $(BINARY)-arm64 $(BINARY)-ppc64le $(BINARY)-darwin
+all: static-tests test templates $(BINARY) $(BINARY)-arm64 $(BINARY)-ppc64le $(BINARY)-darwin ## Build all binaries
 
 .PHONY: static-tests
-static-tests: fmt lint vet ## Run fmt lint and vet against all source
+static-tests: fmt lint imports vet ## Run fmt lint imports and vet against all source
 
 .PHONY: linux
-linux: static-tests test $(BINARY)
+linux: static-tests test templates $(BINARY) ## Build linux binary
 
 .PHONY: darwin
-darwin: static-tests test $(BINARY)-darwin
+darwin: static-tests test templates $(BINARY)-darwin ## Build darwin binary
 
 .PHONY:arm64
-arm64: static-tests test $(BINARY)-arm64
+arm64: static-tests test templates $(BINARY)-arm64 ## Build arm64 binary
 
 SOURCES = $(shell find -name vendor -prune -o -name \*.go -print)
 
@@ -87,7 +87,7 @@ $(GO2XUNIT): ; $(info $(M) building go2xunit…)
 GOBINDATA = $(TOOLS)/go-bindata
 $(GOBINDATA): ; $(info $(M) building go-bindata…)
 	@mkdir -p $(TOOLS)
-	$Q go build -o $@ github.com/go-bindata/go-bindata/cmd/go-bindata
+	$Q go build -o $@ github.com/go-bindata/go-bindata/v3/go-bindata
 
 GOVERSIONINFO = $(TOOLS)/goversioninfo
 $(GOVERSIONINFO): ; $(info $(M) building goversioninfo…)
@@ -137,28 +137,78 @@ test-coverage: fmt lint test-coverage-tools ; $(info $(M) running coverage tests
 	$Q $(GO) tool cover -html=$(COVERAGE_PROFILE) -o $(COVERAGE_HTML)
 	$Q $(GOCOV) convert $(COVERAGE_PROFILE) | $(GOCOVXML) > $(COVERAGE_XML)
 
+.PHONY: templates
+templates: $(GOBINDATA) ; $(info $(M) generating templates.go...) @ ## Generate templates with go-bindata
+	$Q make -C templates/
+
 .PHONY: container
 container: ; $(info $(M) running docker build…) @ ## Run docker build to build a container
 	$Q docker build -t mechserv:local -f Dockerfile .
 
+.PHONY: megalint
+megalint: ; $(info $(M) running golangci-lint...) @ ## run golangci-lint
+	$Q golangci-lint run \
+		--fix \
+		--no-config \
+		--deadline=5m \
+		--timeout=30m \
+		--disable-all \
+		--enable=bodyclose \
+		--enable=deadcode \
+		--enable=depguard \
+		--enable=dogsled \
+		--enable=dupl \
+		--enable=errcheck \
+		--enable=gocognit \
+		--enable=goconst \
+		--enable=gocritic  \
+		--enable=gocyclo \
+		--enable=gofmt \
+		--enable=goimports \
+		--enable=golint \
+		--enable=goprintffuncname \
+		--enable=gosec \
+		--enable=gosimple \
+		--enable=govet \
+		--enable=ineffassign \
+		--enable=maligned \
+		--enable=megacheck \
+		--enable=misspell \
+		--enable=nakedret \
+		--enable=prealloc \
+		--enable=rowserrcheck \
+		--enable=staticcheck \
+		--enable=structcheck \
+		--enable=stylecheck \
+		--enable=typecheck \
+		--enable=unconvert \
+		--enable=unparam \
+		--enable=unused \
+		--enable=varcheck \
+		--enable=whitespace
+
 .PHONY: lint
-lint: $(GOLINT) ; $(info $(M) running golint…) @ ## Run golint change ret=1 to make lint required
+lint: $(GOLINT) ; $(info $(M) running golint…) @ ## Run golint
 	$Q ret=0 && for pkg in $(PKGS); do \
 		test -z "$$($(GOLINT) -set_exit_status=true $$pkg | tee /dev/stderr)" || ret=0 ; \
 	 done ; exit $$ret
 
 .PHONY: fmt
 fmt: ; $(info $(M) running gofmt…) @ ## Run gofmt on all source files
-	@ret=0 && for d in $$($(GO) list -f '{{.Dir}}' ./... | grep -v /vendor/); do \
+	$Q ret=0 && for d in $$($(GO) list -f '{{.Dir}}' ./... | grep -v /vendor/); do \
 		$(GOFMT) -l -w $$d/*.go || ret=$$? ; \
 	 done ; exit $$ret
 
+.PHONY: imports
+imports: $(GOIMPORTS) ; $(info $(M) running goimports...) @ ## Run goimports -w
+	$Q $(GOIMPORTS) -w .
+
 .PHONY: vet
 vet: ; $(info $(M) running go vet…) @ ## Run go vet on all source files
-	$(GOVET) ./...
+	$Q $(GOVET) ./...
 
 .PHONY: test
-test: ; $(info $(M) running tests…) @
+test: ; $(info $(M) running tests…) @ ## Run go test
 	$Q go test -v ./...
 
 .PHONY: clean
